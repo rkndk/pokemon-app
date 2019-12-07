@@ -2,6 +2,7 @@ import React from 'react';
 import {Button, Card, Layout, List} from 'antd';
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
+import {cleanText} from "../utils/Word";
 import axios from 'axios';
 
 const {Content, Header} = Layout;
@@ -77,7 +78,7 @@ class PokemonListPage extends React.Component {
                                 <List.Item>
                                     <Link to={`/detail/${item.name}`}>
                                         <Card>
-                                            <h3>{item.name}</h3>
+                                            <h3 style={{textTransform: 'capitalize'}}>{cleanText(item.name)}</h3>
                                             <p>Owned: {this.getOwnedPokemonByName(item.name)}</p>
                                         </Card>
                                     </Link>

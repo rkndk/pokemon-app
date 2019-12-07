@@ -3,6 +3,7 @@ import {Button, Card, Layout, List} from 'antd';
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
 import {removePokemon} from "../redux/actions/pokemon";
+import {cleanText} from "../utils/Word";
 
 const {Content, Header} = Layout;
 
@@ -41,7 +42,7 @@ class MyPokemonListPage extends React.Component {
                                 <List.Item>
                                     <Card>
                                         <h3>{item.nickname}</h3>
-                                        <p>{item.name}</p>
+                                        <p style={{textTransform: 'capitalize'}}>{cleanText(item.name)}</p>
                                         <div style={{textAlign: 'right'}}>
                                             <Button onClick={() => this.handleRemove(item.id)} type="danger"
                                                     size="small">Remove</Button>

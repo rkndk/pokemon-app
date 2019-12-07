@@ -3,6 +3,7 @@ import {Button, Card, Input, Layout, List, Modal} from 'antd';
 import ReactApexChart from 'react-apexcharts'
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
+import {cleanText} from "../utils/Word";
 import {addPokemon} from "../redux/actions/pokemon";
 import axios from "axios";
 
@@ -137,7 +138,7 @@ class PokemonDetailPage extends React.Component {
                 <Content style={{padding: '0 50px', marginTop: 40, marginBottom: 60}}>
                     <div style={{background: '#fff', padding: 24}}>
                         <div style={{textAlign: 'center'}}>
-                            <h2>{detail.name}</h2>
+                            <h2 style={{textTransform: 'capitalize'}}>{cleanText(detail.name)}</h2>
                             <div style={{display: 'flex', justifyContent: 'center'}}>
                                 <Card
                                     hoverable
@@ -174,20 +175,32 @@ class PokemonDetailPage extends React.Component {
 
                         <List
                             size="small"
-                            header={<h4>{detail.name} Types</h4>}
+                            header={<h4 style={{textTransform: 'capitalize'}}>{cleanText(detail.name)} Types</h4>}
                             bordered
                             dataSource={detail.types}
-                            renderItem={item => <List.Item>{item && item.type ? item.type.name : ''}</List.Item>}
+                            renderItem={item =>
+                                <List.Item>
+                                    <p style={{textTransform: 'capitalize'}}>
+                                        { item && item.type ? cleanText(item.type.name) : '' }
+                                    </p>
+                                </List.Item>
+                            }
                         />
 
                         <br/>
 
                         <List
                             size="small"
-                            header={<h4>{detail.name} Moves</h4>}
+                            header={<h4 style={{textTransform: 'capitalize'}}>{cleanText(detail.name)} Moves</h4>}
                             bordered
                             dataSource={detail.moves}
-                            renderItem={item => <List.Item>{item && item.move ? item.move.name : ''}</List.Item>}
+                            renderItem={item =>
+                                <List.Item>
+                                    <p style={{textTransform: 'capitalize'}}>
+                                        { item && item.move ? cleanText(item.move.name) : '' }
+                                    </p>
+                                </List.Item>
+                            }
                         />
 
                     </div>
