@@ -1,42 +1,35 @@
 import React from 'react';
-import {
-    Layout,
-    List,
-    Card,
-    Button
-} from 'antd';
+import {Button, Card, Layout, List} from 'antd';
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
+import axios from 'axios';
 
 const {Content, Header} = Layout;
-const data = [
-    {
-        name: 'Pokemon 1',
-    },
-    {
-        name: 'Pokemon 2',
-    },
-    {
-        name: 'Pokemon 3',
-    },
-    {
-        name: 'Pokemon 4',
-    },
-    {
-        name: 'Pokemon 5',
-    },
-];
 
 class PokemonListPage extends React.Component {
     state = {
-        currentPage: 1,
+        data: [],
+        count: 0
+    };
+    currentPage = 1;
+    limit = 20;
+
+    getData = () => {
+        const offset = (this.currentPage - 1) * this.limit;
+        axios.get(`https://pokeapi.co/api/v2/pokemon/?offset=${offset}&limit=${this.limit}`)
+            .then(res => {
+                const data = res.data;
+                this.setState({data: data.results, count: data.count});
+            });
     };
 
+    componentDidMount() {
+        this.getData();
+    }
+
     onChangePage = page => {
-        console.log(page);
-        this.setState({
-            currentPage: page,
-        });
+        this.currentPage = page;
+        this.getData();
     };
 
     getOwnedPokemonByName = (name) => {
@@ -46,6 +39,7 @@ class PokemonListPage extends React.Component {
     };
 
     render() {
+        const {data, count} = this.state;
         return (
             <Layout style={{minHeight: '100vh'}}>
                 <Header>
@@ -74,9 +68,9 @@ class PokemonListPage extends React.Component {
                                 style: {textAlign: 'center'},
                                 size: 'small',
                                 pageSize: 20,
-                                current: this.state.currentPage,
+                                current: this.currentPage,
                                 onChange: this.onChangePage,
-                                total: 500
+                                total: count
                             }}
                             dataSource={data}
                             renderItem={item => (

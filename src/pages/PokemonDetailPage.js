@@ -1,36 +1,13 @@
 import React from 'react';
-import {
-    Layout,
-    Card,
-    List,
-    Button,
-    Modal,
-    Input
-} from 'antd';
+import {Button, Card, Input, Layout, List, Modal} from 'antd';
 import ReactApexChart from 'react-apexcharts'
 import {Link} from "react-router-dom";
 import {connect} from "react-redux";
 import {addPokemon} from "../redux/actions/pokemon";
+import axios from "axios";
 
 const {Content, Header} = Layout;
 const {Meta} = Card;
-const data = [
-    {
-        name: 'Pokemon 1',
-    },
-    {
-        name: 'Pokemon 2',
-    },
-    {
-        name: 'Pokemon 3',
-    },
-    {
-        name: 'Pokemon 4',
-    },
-    {
-        name: 'Pokemon 5',
-    },
-];
 
 class PokemonDetailPage extends React.Component {
     state = {
@@ -47,14 +24,34 @@ class PokemonDetailPage extends React.Component {
                     tickAmount: 4
                 }
             },
-            series: [{
-                name: 'Data',
-                data: [80, 50, 30, 40, 100, 20],
-            }]
+            series: []
         },
     };
     nickname = '';
     successModal = null;
+
+    componentDidMount() {
+        const {name} = this.props.match.params;
+        axios.get(`https://pokeapi.co/api/v2/pokemon/${name}`)
+            .then(res => {
+                const data = res.data;
+                this.setState({detail: data});
+                this.generateStat(data.stats)
+            });
+    }
+
+    generateStat = (stats = []) => {
+        const keys = ['speed', 'special-defense', 'special-attack', 'defense', 'attack', 'hp'];
+        const values = [];
+        keys.forEach(i => {
+            const item = stats.filter(j => j.stat && j.stat.name === i);
+            const value = item && item.length > 0 && item[0].base_stat ? item[0].base_stat : 0;
+            values.push(value);
+        });
+        const {statChart} = this.state;
+        statChart.series.push({data: values});
+        this.setState({statChart: statChart});
+    };
 
     handleChangeNickname = (event) => {
         this.nickname = event.target.value;
@@ -93,7 +90,6 @@ class PokemonDetailPage extends React.Component {
     };
 
     saveNewPokemon = () => {
-        console.log('save', this.nickname);
         const {name} = this.props.match.params;
 
         // create new pokemon
@@ -127,7 +123,7 @@ class PokemonDetailPage extends React.Component {
     };
 
     render() {
-        const {statChart} = this.state;
+        const {statChart, detail} = this.state;
         return (
             <Layout style={{minHeight: '100vh'}}>
                 <Header><h2 style={{color: '#fff'}}>Pokemon Detail</h2></Header>
@@ -141,14 +137,14 @@ class PokemonDetailPage extends React.Component {
                 <Content style={{padding: '0 50px', marginTop: 40, marginBottom: 60}}>
                     <div style={{background: '#fff', padding: 24}}>
                         <div style={{textAlign: 'center'}}>
-                            <h2>Pokemon Name</h2>
+                            <h2>{detail.name}</h2>
                             <div style={{display: 'flex', justifyContent: 'center'}}>
                                 <Card
                                     hoverable
                                     style={{width: 100}}
                                     cover={<img
-                                        src={'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/1.png'}
-                                        alt="Front View"/>}
+                                        src={detail.sprites ? detail.sprites.front_default : ''}
+                                        alt=""/>}
                                 >
                                     <Meta description="Front View"/>
                                 </Card>
@@ -156,14 +152,14 @@ class PokemonDetailPage extends React.Component {
                                     hoverable
                                     style={{width: 100}}
                                     cover={<img
-                                        src={'https://raw.githubusercontent.com/PokeAPI/sprites/master/sprites/pokemon/back/1.png'}
-                                        alt="Back View"/>}
+                                        src={detail.sprites ? detail.sprites.back_default : ''}
+                                        alt=""/>}
                                 >
                                     <Meta description="Back View"/>
                                 </Card>
                             </div>
                             <br/>
-                            <p>Height: 7, Weight: 70</p>
+                            <p>Height: {detail.height}, Weight: {detail.weight}</p>
                             <Button onClick={this.catchPokemon} type="primary" shape="round" size="large">
                                 Catch
                             </Button>
@@ -171,28 +167,29 @@ class PokemonDetailPage extends React.Component {
 
                         <br/>
 
-                        <List
-                            size="small"
-                            header={<h4>Pokemon Name Moves</h4>}
-                            bordered
-                            dataSource={data}
-                            renderItem={item => <List.Item>{item.name}</List.Item>}
-                        />
-
-                        <br/>
-
-                        <List
-                            size="small"
-                            header={<h4>Pokemon Name Types</h4>}
-                            bordered
-                            dataSource={data}
-                            renderItem={item => <List.Item>{item.name}</List.Item>}
-                        />
-
-                        <br/>
-
                         <ReactApexChart options={statChart.options} series={statChart.series} type="radar"
                                         height="350"/>
+
+                        <br/>
+
+                        <List
+                            size="small"
+                            header={<h4>{detail.name} Types</h4>}
+                            bordered
+                            dataSource={detail.types}
+                            renderItem={item => <List.Item>{item && item.type ? item.type.name : ''}</List.Item>}
+                        />
+
+                        <br/>
+
+                        <List
+                            size="small"
+                            header={<h4>{detail.name} Moves</h4>}
+                            bordered
+                            dataSource={detail.moves}
+                            renderItem={item => <List.Item>{item && item.move ? item.move.name : ''}</List.Item>}
+                        />
+
                     </div>
                 </Content>
             </Layout>
