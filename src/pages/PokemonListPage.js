@@ -6,6 +6,7 @@ import {
     Button
 } from 'antd';
 import {Link} from "react-router-dom";
+import {connect} from "react-redux";
 
 const {Content, Header} = Layout;
 const data = [
@@ -28,7 +29,7 @@ const data = [
 
 class PokemonListPage extends React.Component {
     state = {
-        currentPage: 3,
+        currentPage: 1,
     };
 
     onChangePage = page => {
@@ -36,6 +37,12 @@ class PokemonListPage extends React.Component {
         this.setState({
             currentPage: page,
         });
+    };
+
+    getOwnedPokemonByName = (name) => {
+        const myPokemons = this.props.myPokemons;
+        const owned = myPokemons.filter(i => i.name === name);
+        return owned.length;
     };
 
     render() {
@@ -77,7 +84,7 @@ class PokemonListPage extends React.Component {
                                     <Link to={`/detail/${item.name}`}>
                                         <Card>
                                             <h3>{item.name}</h3>
-                                            <p>Owned: 0</p>
+                                            <p>Owned: {this.getOwnedPokemonByName(item.name)}</p>
                                         </Card>
                                     </Link>
                                 </List.Item>
@@ -90,4 +97,10 @@ class PokemonListPage extends React.Component {
     }
 }
 
-export default PokemonListPage;
+const mapStateToProps = state => {
+    return {
+        myPokemons: state.pokemon
+    };
+};
+
+export default connect(mapStateToProps)(PokemonListPage);

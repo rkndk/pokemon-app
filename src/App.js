@@ -14,15 +14,9 @@ function App() {
         <Router>
             <div>
                 <Switch>
-                    <Route exact path="/">
-                        <PokemonListPage/>
-                    </Route>
-                    <Route path="/detail/:name">
-                        <PokemonDetailPage/>
-                    </Route>
-                    <Route path="/collected">
-                        <MyPokemonListPage/>
-                    </Route>
+                    <Route exact path="/" component={PokemonListPage}/>
+                    <Route path="/detail/:name" component={PokemonDetailPage}/>
+                    <Route path="/collected" component={MyPokemonListPage}/>
                 </Switch>
             </div>
         </Router>

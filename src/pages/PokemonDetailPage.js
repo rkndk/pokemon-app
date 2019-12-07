@@ -9,6 +9,8 @@ import {
 } from 'antd';
 import ReactApexChart from 'react-apexcharts'
 import {Link} from "react-router-dom";
+import {connect} from "react-redux";
+import {addPokemon} from "../redux/actions/pokemon";
 
 const {Content, Header} = Layout;
 const {Meta} = Card;
@@ -32,6 +34,7 @@ const data = [
 
 class PokemonDetailPage extends React.Component {
     state = {
+        detail: {},
         statChart: {
             options: {
                 labels: ['Speed', 'Special Defense', 'Special Attack', 'Defense', 'Attack', 'HP'],
@@ -91,6 +94,17 @@ class PokemonDetailPage extends React.Component {
 
     saveNewPokemon = () => {
         console.log('save', this.nickname);
+        const {name} = this.props.match.params;
+
+        // create new pokemon
+        const pokemon = {
+            id: Date.now(),
+            nickname: this.nickname,
+            name: name,
+        };
+
+        // save state
+        this.props.addPokemon(pokemon);
 
         // reset
         this.nickname = '';
@@ -186,4 +200,10 @@ class PokemonDetailPage extends React.Component {
     }
 }
 
-export default PokemonDetailPage;
+const mapDispatchToProps = dispatch => {
+    return {
+        addPokemon: (pokemon) => dispatch(addPokemon(pokemon)),
+    }
+};
+
+export default connect(null, mapDispatchToProps)(PokemonDetailPage);

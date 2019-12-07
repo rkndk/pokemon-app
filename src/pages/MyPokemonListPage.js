@@ -1,38 +1,19 @@
 import React from 'react';
-import {
-    Layout,
-    List,
-    Card, Button
-} from 'antd';
+import {Button, Card, Layout, List} from 'antd';
 import {Link} from "react-router-dom";
+import {connect} from "react-redux";
+import {removePokemon} from "../redux/actions/pokemon";
 
 const {Content, Header} = Layout;
-const data = [
-    {
-        nickname: 'Pokemon 1',
-        pokemon: 'Pokemon Name',
-    },
-    {
-        nickname: 'Pokemon 2',
-        pokemon: 'Pokemon Name',
-    },
-    {
-        nickname: 'Pokemon 3',
-        pokemon: 'Pokemon Name',
-    },
-    {
-        nickname: 'Pokemon 4',
-        pokemon: 'Pokemon Name',
-    },
-    {
-        nickname: 'Pokemon 5',
-        pokemon: 'Pokemon Name',
-    },
-];
 
 class MyPokemonListPage extends React.Component {
+    handleRemove = (id) => {
+        // remove data
+        this.props.removePokemon(id);
+    };
 
     render() {
+        const {myPokemons} = this.props;
         return (
             <Layout style={{minHeight: '100vh'}}>
                 <Header><h2 style={{color: '#fff'}}>My Pokemon</h2></Header>
@@ -55,14 +36,15 @@ class MyPokemonListPage extends React.Component {
                             }}
                             itemLayout="vertical"
                             size="large"
-                            dataSource={data}
+                            dataSource={myPokemons}
                             renderItem={item => (
                                 <List.Item>
                                     <Card>
                                         <h3>{item.nickname}</h3>
-                                        <p>{item.pokemon}</p>
+                                        <p>{item.name}</p>
                                         <div style={{textAlign: 'right'}}>
-                                            <Button type="danger" size="small">Remove</Button>
+                                            <Button onClick={() => this.handleRemove(item.id)} type="danger"
+                                                    size="small">Remove</Button>
                                         </div>
                                     </Card>
                                 </List.Item>
@@ -75,4 +57,16 @@ class MyPokemonListPage extends React.Component {
     }
 }
 
-export default MyPokemonListPage;
+const mapStateToProps = state => {
+    return {
+        myPokemons: state.pokemon
+    };
+};
+
+const mapDispatchToProps = dispatch => {
+    return {
+        removePokemon: (id) => dispatch(removePokemon(id)),
+    }
+};
+
+export default connect(mapStateToProps, mapDispatchToProps)(MyPokemonListPage);
